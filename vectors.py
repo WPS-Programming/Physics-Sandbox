@@ -1,114 +1,65 @@
-from math import hypot, sin, cos, tan, atan2
-
+from math import *
 
 class Vector(object):
     
-    def __init__(self, x=0, y=0):
+    def __init__(self, mag=0, angle=0):
+
+        self.duration = 0
         
-        if type(x) in [float, int] and \
-            type(y) in [float, int]:
+        if type(mag) in [float, int] and \
+            type(angle) in [float, int]:
                 
-            self.x = x
-            self.y = y
+            self.magnitude = mag
+            self.angle = angle
         else:
             raise TypeError("valid types: int, float")
     
-    @property
-    def magnitude(self):
-        '''
-        returns the magnitude of the vector
-        '''
+    def components(self, x=0, y=0):
         
-        return round(hypot(self.x, self.y),5)
-    
-    @magnitude.setter
-    def magnitude(self, value):
-        angle = self.angle
-        self.x = round(cos(angle),5) * value
-        self.y = round(sin(angle),5) * value
+        # do stuff
+
+        return self
+
+    @property
+    def x(self):
+        return cos(self.angle)*self.magnitude
     
     @property
-    def angle(self):
-        '''
-        returns the angle of the vector
-        '''
-        
-        return atan2(self.y, self.x)
+    def y(self):
+        return sin(self.angle)*self.magnitude
+
+    @x.setter
+    def x(self, val):
+        x = val
+        y = self.y
+
+        self.magnitude = hypot(x, y)
+        self.angle = atan2(y, x)
     
-    @angle.setter
-    def angle(self, value):
-        magnitude = self.magnitude
-        self.x = round(cos(value),5) * magnitude
-        self.y = round(sin(value),5) * magnitude
-        
+    @y.setter
+    def y(self, val):
+        x = self.x
+        y = val
+
+        self.magnitude = hypot(x, y)
+        self.angle = atan2(y, x)
+
     def __add__(self, other): 
-        return Vector(self.x+other.x, self.y+other.y)
+        return Vector().components(self.x+other.x, self.y+other.y)
 
     def __sub__(self, other):
-        return Vector(self.x-other.x, self.y-other.y)
+        return Vector().components(self.x-other.x, self.y-other.y)
     
     def __mul__(self, other):
         
         if type(other) in [float, int]:
-            v = Vector(self.x, self.y)
-            v.set_magnitude(self.magnitude*other)
+            v = Vector(self.magnitude*other, self.angle)
             return v
         else:
             raise NotImplementedError("supported types: float, int")
         
     def __str__(self):
-        return f"{self.__class__.__name__}(x={self.x}, y={self.y}, mag={round(self.magnitude,2)})"
-    
-class Force(Vector):
-    
-    def __init__(self, force : tuple=(0,0), time : float=0):
-        
-        if type(force) in (tuple, list):    
-            super().__init__(*force)
-        else:
-            super().__init__(force.x, force.y)
-        
-        if type(time) in [float, int]:
-            self.time = time
-        else:
-            raise TypeError("valid types: int, float")
-    
-    def normalize(self, time : float=1):
-        '''
-        Compresses or stretches the magnitude to the desired time length
-        '''
-        
-        if type(time) not in [float, int]:
-            raise TypeError("valid types: int, float")
-        
-        scale = self.time / time
-        self.magnitude *= scale
-    
-    def __add__(self, other):      
-        if type(other) == Vector:
-            return Force(self.x+other.x, self.y+other.y, self.time)
-        elif type(other) == Force:
-            return [self, other]
+        return f"{self.__class__.__name__}(angle={round(self.angle,2)}, mag={round(self.magnitude,2)}, x={round(self.x,2)}, y={round(self.y,2)})"
 
-    def __sub__(self, other):
-        if type(other) == Vector:
-            return Force(self.x-other.x, self.y-other.y, self.time)
-        elif type(other) == Force:
-            return [self, other]
-    
-    def __mul__(self, other):
-        
-        if type(other) in [float, int]:
-            v = Vector(self.x, self.y)
-            v.set_magnitude(self.magnitude*other)
-            return Force(v, self.time)
-        else:
-            raise NotImplementedError("supported types: float, int")
-    
-    def __str__(self):
-            return f"{self.__class__.__name__}(x={self.x}, y={self.y}, mag={round(self.magnitude,2)}), sec={round(self.time,2)}"
-        
 
-x = Force(Vector(3,4),5)
-x.normalize(1)
-print(x)
+class Particle()
